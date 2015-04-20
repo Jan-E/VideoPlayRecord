@@ -47,7 +47,7 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
 }
 
 
@@ -120,6 +120,8 @@
         || (controller == nil))
         return NO;
     UIImagePickerController *mediaUI = [[UIImagePickerController alloc] init];
+    mediaUI.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
     mediaUI.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
     
     mediaUI.mediaTypes = [[NSArray alloc] initWithObjects: (NSString *) kUTTypeMovie, nil];
@@ -161,10 +163,11 @@
         //Create AVMutableComposition Object.This object will hold our multiple AVMutableCompositionTrack.
         AVMutableComposition* mixComposition = [[AVMutableComposition alloc] init];
     
-        //VIDEO TRACK
+        //VIDEO TRACK 1
         AVMutableCompositionTrack *firstTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         [firstTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, firstAsset.duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
        
+        //VIDEO TRACK 2
         AVMutableCompositionTrack *secondTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         [secondTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, secondAsset.duration) ofTrack:[[secondAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:firstAsset.duration error:nil];
         
@@ -187,14 +190,14 @@
         if(firstTransform.a == 0 && firstTransform.b == -1.0 && firstTransform.c == 1.0 && firstTransform.d == 0)  {FirstAssetOrientation_ =  UIImageOrientationLeft; isFirstAssetPortrait_ = YES; NSLog(@"Video 1 %s", "UIImageOrientationLeft");}
         if(firstTransform.a == 1.0 && firstTransform.b == 0 && firstTransform.c == 0 && firstTransform.d == 1.0)   {FirstAssetOrientation_ =  UIImageOrientationUp; NSLog(@"Video 1 %s", "UIImageOrientationUp");}
         if(firstTransform.a == -1.0 && firstTransform.b == 0 && firstTransform.c == 0 && firstTransform.d == -1.0) {FirstAssetOrientation_ = UIImageOrientationDown; NSLog(@"Video 1 %s", "UIImageOrientationDown");}
-        CGFloat FirstAssetScaleToFitRatio = 320.0/FirstAssetTrack.naturalSize.width;
+        CGFloat FirstAssetScaleToFitRatio = 1; // 320.0/FirstAssetTrack.naturalSize.width;
         if(isFirstAssetPortrait_){
-            FirstAssetScaleToFitRatio = 320.0/FirstAssetTrack.naturalSize.height;
+            FirstAssetScaleToFitRatio = 1; // 320.0/FirstAssetTrack.naturalSize.height;
             CGAffineTransform FirstAssetScaleFactor = CGAffineTransformMakeScale(FirstAssetScaleToFitRatio,FirstAssetScaleToFitRatio);
             [FirstlayerInstruction setTransform:CGAffineTransformConcat(FirstAssetTrack.preferredTransform, FirstAssetScaleFactor) atTime:kCMTimeZero];
         }else{
             CGAffineTransform FirstAssetScaleFactor = CGAffineTransformMakeScale(FirstAssetScaleToFitRatio,FirstAssetScaleToFitRatio);
-            [FirstlayerInstruction setTransform:CGAffineTransformConcat(CGAffineTransformConcat(FirstAssetTrack.preferredTransform, FirstAssetScaleFactor),CGAffineTransformMakeTranslation(0, 160)) atTime:kCMTimeZero];
+            [FirstlayerInstruction setTransform:CGAffineTransformConcat(CGAffineTransformConcat(FirstAssetTrack.preferredTransform, FirstAssetScaleFactor),CGAffineTransformMakeTranslation(0, 0)) atTime:kCMTimeZero];
         }
         [FirstlayerInstruction setOpacity:0.0 atTime:firstAsset.duration];
         
@@ -207,15 +210,15 @@
         if(secondTransform.a == 0 && secondTransform.b == -1.0 && secondTransform.c == 1.0 && secondTransform.d == 0)  {SecondAssetOrientation_ =  UIImageOrientationLeft; isSecondAssetPortrait_ = YES; NSLog(@"Video 2 %s", "UIImageOrientationLeft");}
         if(secondTransform.a == 1.0 && secondTransform.b == 0 && secondTransform.c == 0 && secondTransform.d == 1.0)   {SecondAssetOrientation_ =  UIImageOrientationUp; NSLog(@"Video 2 %s", "UIImageOrientationUp");}
         if(secondTransform.a == -1.0 && secondTransform.b == 0 && secondTransform.c == 0 && secondTransform.d == -1.0) {SecondAssetOrientation_ = UIImageOrientationDown; NSLog(@"Video 2 %s", "UIImageOrientationDown");}
-        CGFloat SecondAssetScaleToFitRatio = 320.0/SecondAssetTrack.naturalSize.width;
+        CGFloat SecondAssetScaleToFitRatio = 1; // 320.0/SecondAssetTrack.naturalSize.width;
         if(isSecondAssetPortrait_){
-            SecondAssetScaleToFitRatio = 320.0/SecondAssetTrack.naturalSize.height;
+            SecondAssetScaleToFitRatio = 1; // 320.0/SecondAssetTrack.naturalSize.height;
             CGAffineTransform SecondAssetScaleFactor = CGAffineTransformMakeScale(SecondAssetScaleToFitRatio,SecondAssetScaleToFitRatio);
             [SecondlayerInstruction setTransform:CGAffineTransformConcat(SecondAssetTrack.preferredTransform, SecondAssetScaleFactor) atTime:firstAsset.duration];
         }else{
             ;
             CGAffineTransform SecondAssetScaleFactor = CGAffineTransformMakeScale(SecondAssetScaleToFitRatio,SecondAssetScaleToFitRatio);
-            [SecondlayerInstruction setTransform:CGAffineTransformConcat(CGAffineTransformConcat(SecondAssetTrack.preferredTransform, SecondAssetScaleFactor),CGAffineTransformMakeTranslation(0, 160)) atTime:firstAsset.duration];
+            [SecondlayerInstruction setTransform:CGAffineTransformConcat(CGAffineTransformConcat(SecondAssetTrack.preferredTransform, SecondAssetScaleFactor),CGAffineTransformMakeTranslation(0, 0)) atTime:firstAsset.duration];
         }
         
        
@@ -224,7 +227,7 @@
         AVMutableVideoComposition *MainCompositionInst = [AVMutableVideoComposition videoComposition];
         MainCompositionInst.instructions = [NSArray arrayWithObject:MainInstruction];
         MainCompositionInst.frameDuration = CMTimeMake(1, 30);
-        MainCompositionInst.renderSize = CGSizeMake(320.0, 480.0);
+        MainCompositionInst.renderSize = CGSizeMake(480.0, 360.0);
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];	

@@ -36,10 +36,20 @@
     // e.g. self.myOutlet = nil;
 }
 
+- (UIModalPresentationStyle)modalPresentationStyle
+{
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    {
+        return UIModalPresentationFormSheet;
+    }
+    
+    return [super modalPresentationStyle];
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
 }
 
 - (IBAction)PlayVideo:(id)sender {
@@ -57,8 +67,10 @@
         return NO;
     
     UIImagePickerController *mediaUI = [[UIImagePickerController alloc] init];
-    mediaUI.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    mediaUI.modalPresentationStyle = UIModalPresentationCurrentContext;
     
+    mediaUI.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+
     mediaUI.mediaTypes = [[NSArray alloc] initWithObjects: (NSString *) kUTTypeMovie, nil];
     
     // Hides the controls for moving & scaling pictures, or for
@@ -89,8 +101,7 @@
     if (CFStringCompare ((__bridge_retained CFStringRef)mediaType, kUTTypeMovie, 0)
         == kCFCompareEqualTo) {
         
-        NSString *moviePath = [[info objectForKey:
-                                UIImagePickerControllerMediaURL] path];
+        //NSString *moviePath = [[info objectForKey: UIImagePickerControllerMediaURL] path];
         MPMoviePlayerViewController* theMovie =
         [[MPMoviePlayerViewController alloc] initWithContentURL: [info objectForKey:
                                                                   UIImagePickerControllerMediaURL]];
